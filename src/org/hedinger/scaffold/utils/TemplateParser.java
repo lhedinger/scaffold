@@ -10,8 +10,7 @@ import org.hedinger.scaffold.node.BranchNode;
 import org.hedinger.scaffold.node.NewlineLeaf;
 import org.hedinger.scaffold.node.StaticLeaf;
 
-public class TemplateParser
-{
+public class TemplateParser {
     public static final String NODE_ROOT = "root";
     public static final String NODE_NEWLINE = "NEWLINE";
 
@@ -20,33 +19,26 @@ public class TemplateParser
     private HashMap<String, ArrayList<String>> childMap;
     private int anonymousCount;
 
-    public TemplateParser()
-    {
+    public TemplateParser() {
         slotMap = new HashMap<String, AbstractNode>();
         childMap = new HashMap<String, ArrayList<String>>();
         anonymousCount = 0;
     }
 
-    public String getLog()
-    {
+    public String getLog() {
         return logger.toString();
     }
 
-    public AbstractNode getRoot()
-    {
+    public AbstractNode getRoot() {
         return slotMap.get(NODE_ROOT);
     }
 
-    public void parseTemplate(String uri) throws Exception
-    {
+    public void parseTemplate(String uri) throws Exception {
         BufferedReader br = new BufferedReader(new FileReader(uri));
 
-        try
-        {
+        try {
             parseTemplateHelper(br);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw e;
         }
 
@@ -54,71 +46,60 @@ public class TemplateParser
 
         slotMap.put(NODE_NEWLINE, new NewlineLeaf());
 
-        for (String parentId : childMap.keySet())
-        {
+        for (String parentId : childMap.keySet()) {
             ArrayList<String> children = childMap.get(parentId);
 
             AbstractNode parent = slotMap.get(parentId);
 
-            if (parent instanceof BranchNode)
-            {
-                for (String childId : children)
-                {
+            if (parent instanceof BranchNode) {
+                for (String childId : children) {
                     AbstractNode child = slotMap.get(childId);
 
-                    if (child == null)
-                    {
+                    if (child == null) {
                         throw new Exception("Node " + childId + " not found");
                     }
 
                     ((BranchNode) parent).addNode(child);
                 }
-            }
-            else
-            {
+            } else {
                 throw new Exception("Node " + parentId + " undefined");
             }
         }
     }
 
-    private void parseTemplateHelper(BufferedReader br) throws Exception
-    {
+    private void parseTemplateHelper(BufferedReader br) throws Exception {
         int c_int = 0;
         int state = -1;
         String varName = "", varType = "";
 
-        while ((c_int = br.read()) != -1)
-        {
+        while ((c_int = br.read()) != -1) {
             char c = (char) c_int;
 
-            System.out.print(c);
+            //System.out.print(c);
 
-            switch (state)
-            {
-                case -1:
-                {
-                    if (c == '%') state = 0;
+            switch (state) {
+                case -1: {
+                    if (c == '%')
+                        state = 0;
                     break;
                 }
-                case 0:
-                {
-                    if (c == ':') state = 1;
-                    else if (c == '[') throw new Exception("Empty Variable Name");
-                    else varType += c;
+                case 0: {
+                    if (c == ':')
+                        state = 1;
+                    else if (c == '[')
+                        throw new Exception("Empty Variable Name");
+                    else
+                        varType += c;
                     break;
                 }
-                case 1:
-                {
-                    if (c == '[')
-                    {
+                case 1: {
+                    if (c == '[') {
                         generateSlot(varType.trim(), varName, null);
                         parseTemplateBody(br, varType, varName);
                         varType = "";
                         varName = "";
                         state = -1;
-                    }
-                    else
-                    {
+                    } else {
                         varName += c;
                     }
                     break;
@@ -127,55 +108,40 @@ public class TemplateParser
         }
     }
 
-    private void parseTemplateBody(BufferedReader br, String parentVarType, String parentVarName) throws Exception
-    {
+    private void parseTemplateBody(BufferedReader br, String parentVarType, String parentVarName) throws Exception {
         int c_int = 0;
         int state = -1;
         String body = "", varName = "", varType = "";
 
         state = -1;
 
-        if (parentVarType.equals("V"))
-        {
+        if (parentVarType.equals("V")) {
             throw new Exception();
         }
 
-        while ((c_int = br.read()) != -1)
-        {
+        while ((c_int = br.read()) != -1) {
             char c = (char) c_int;
 
-            System.out.print(c);
+            //System.out.print(c);
 
-            switch (state)
-            {
-                case -1:
-                {
-                    if (c == '%')
-                    {
+            switch (state) {
+                case -1: {
+                    if (c == '%') {
                         generateStatic(body.trim(), parentVarName);
                         body = "";
                         state = 0;
-                    }
-                    else if (c == ']')
-                    {
+                    } else if (c == ']') {
                         state = 3;
-                    }
-                    else
-                    {
+                    } else {
                         body += c;
                     }
                     break;
                 }
-                case 0:
-                {
-                    if (c == '[')
-                    {
-                        if (varType.isEmpty())
-                        {
+                case 0: {
+                    if (c == '[') {
+                        if (varType.isEmpty()) {
                             state = 1;
-                        }
-                        else
-                        {
+                        } else {
                             varName = generateAnonymous(varType.trim(), parentVarName);
                             parseTemplateBody(br, varType, varName);
                             varName = "";
@@ -184,54 +150,41 @@ public class TemplateParser
                             state = -1;
                         }
 
-                    }
-                    else
-                    {
+                    } else {
                         varType += c;
                     }
                     break;
                 }
                 case 1: // anon var
                 {
-                    if (c == ']')
-                    {
+                    if (c == ']') {
                         linkChildHelper(body.trim(), parentVarName);
                         body = "";
                         state = 2;
-                    }
-                    else
-                    {
+                    } else {
                         body += c;
                     }
                     break;
                 }
-                case 2:
-                {
-                    if (c == '%')
-                    {
+                case 2: {
+                    if (c == '%') {
                         varName = "";
                         varType = "";
                         body = "";
                         state = -1;
-                    }
-                    else
-                    {
+                    } else {
                         return;
                     }
                     break;
                 }
-                case 3:
-                {
-                    if (c == '%')
-                    {
+                case 3: {
+                    if (c == '%') {
                         generateStatic(body.trim(), parentVarName);
                         varType = "";
                         body = "";
                         state = -1;
                         return;
-                    }
-                    else
-                    {
+                    } else {
                         body += ']';
                         body += c;
                         state = -1;
@@ -241,8 +194,7 @@ public class TemplateParser
         }
     }
 
-    private String generateAnonymous(String type, String parent) throws Exception
-    {
+    private String generateAnonymous(String type, String parent) throws Exception {
         anonymousCount++;
 
         String name = "anon-" + anonymousCount;
@@ -251,10 +203,8 @@ public class TemplateParser
         return name;
     }
 
-    private void generateStatic(String body, String parent) throws Exception
-    {
-        if (body.trim().isEmpty())
-        {
+    private void generateStatic(String body, String parent) throws Exception {
+        if (body.trim().isEmpty()) {
             return;
         }
 
@@ -266,53 +216,52 @@ public class TemplateParser
         linkChildHelper(name, parent);
     }
 
-    private void generateSlot(String type, String name, String parent) throws Exception
-    {
-        if (name == null) throw new IllegalArgumentException();
+    private void generateSlot(String type, String name, String parent) throws Exception {
+        if (name == null)
+            throw new IllegalArgumentException();
 
-        if (name.trim().isEmpty()) throw new IllegalArgumentException();
+        if (name.trim().isEmpty())
+            throw new IllegalArgumentException();
 
-        if (!name.matches("[a-zA-Z0-9]*")) throw new Exception("Invalid name " + name);
+        if (!name.matches("[a-zA-Z0-9]*"))
+            throw new Exception("Invalid name " + name);
 
         generateSlotHelper(type, name, parent);
     }
 
-    private void generateSlotHelper(String type, String name, String parent) throws Exception
-    {
+    private void generateSlotHelper(String type, String name, String parent) throws Exception {
         AbstractNode node = null;
 
-        if (type == null) throw new IllegalArgumentException();
+        if (type == null)
+            throw new IllegalArgumentException();
 
-        if (type.equals("N"))
-        {
+        if (type.equals("N")) {
             node = new BranchNode(1, 1);
         }
-        if (type.equals("M"))
-        {
+        if (type.equals("M")) {
             node = new BranchNode(1);
         }
-        if (type.equals("O"))
-        {
+        if (type.equals("O")) {
             node = new BranchNode(0, 1);
         }
 
-        if (node == null) throw new Exception("Invalid type: " + type);
+        if (node == null)
+            throw new Exception("Invalid type: " + type);
 
         slotMap.put(name, node);
 
         linkChildHelper(name, parent);
     }
 
-    private void linkChildHelper(String name, String parent) throws Exception
-    {
-        if(parent == null)
-        {
+    private void linkChildHelper(String name, String parent) throws Exception {
+        if (parent == null) {
             return;
         }
-        
+
         ArrayList<String> list = childMap.get(parent);
 
-        if (list == null) list = new ArrayList<String>();
+        if (list == null)
+            list = new ArrayList<String>();
 
         list.add(name);
 

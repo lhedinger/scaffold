@@ -3,24 +3,29 @@ package org.hedinger.scaffold.node;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.StringBounds;
 
-public class StaticLeaf extends LeafNode
-{
-    public StaticLeaf(String value)
-    {
+public class StaticLeaf extends LeafNode {
+
+    private final int length;
+    
+    public StaticLeaf(String value) {
         super(value);
+        length = value.length();
     }
 
     @Override
-    public StringBounds matches(SmartBuffer body, int offset) throws Exception
-    {
-        body.skip(offset);
+    public StringBounds matches(SmartBuffer body, StringBounds allowedRange) throws Exception {
 
-        int len = value.length();
+        int i = body.indexOf(value, allowedRange.start);
 
-        int i = body.indexOf(value);
+        if (i == -1)
+            return null;
 
-        if (i == -1) return null;
+        StringBounds output = new StringBounds(i, i + length);
 
-        return new StringBounds(i, i + len);
+        if (!output.subsetOf(allowedRange)) {
+            return null;
+        }
+
+        return output;
     }
 }
