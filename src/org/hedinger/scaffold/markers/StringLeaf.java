@@ -19,14 +19,16 @@ public class StringLeaf extends StringNode {
     }
 
     @Override
-    public void grow(int step) throws Exception {
+    public boolean grow(int step) throws Exception {
 
         if (matchedRange != null) {
-            return;
+            throw new Exception("this leaf has already grown");
         }
 
         matchedRange = leafTemplate.matches(input, allowedRange);
         output = input.substring(matchedRange);
+        
+        return (matchedRange != null);
     }
 
     @Override

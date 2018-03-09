@@ -16,8 +16,13 @@ public class StringTree {
 
     public void run() throws Exception {
         while (!root.isDone()) {
-            root.growOne();
-            System.out.println(TreePrinter.print(root));
+            boolean good = root.growOne();
+            
+            //System.out.println(TreePrinter.print(root));
+
+            if (!good) {
+                break;
+            }
         }
     }
 
