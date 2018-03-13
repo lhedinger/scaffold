@@ -11,7 +11,7 @@ public class StringLeaf extends StringNode {
     private LeafNode leafTemplate;
     private StringBounds matchedRange;
 
-    private String output;
+    private String foundValue;
 
     public StringLeaf(AbstractNode template, StringNode parent, int start, int end) {
         super(template, parent, start, end);
@@ -19,16 +19,19 @@ public class StringLeaf extends StringNode {
     }
 
     @Override
-    public boolean grow(int step) throws Exception {
+    public int grow(int step) throws Exception {
 
         if (matchedRange != null) {
             throw new Exception("this leaf has already grown");
         }
 
         matchedRange = leafTemplate.matches(input, allowedRange);
-        output = input.substring(matchedRange);
+        foundValue = input.substring(matchedRange);
         
-        return (matchedRange != null);
+       if (matchedRange == null) {
+           return -1;
+       }
+       return 1;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class StringLeaf extends StringNode {
 
     @Override
     public String generateOutput() {
-        return output;
+        return foundValue;
     }
 
     @Override
@@ -63,7 +66,15 @@ public class StringLeaf extends StringNode {
     }
 
     @Override
+    public StringNode deepClone() {
+        StringLeaf leaf = new StringLeaf(template, parent, allowedRange.start, allowedRange.end);
+        leaf.matchedRange = new StringBounds(matchedRange.start, matchedRange.end);
+        leaf.foundValue = this.foundValue;
+        return leaf;
+    }
+    
+    @Override
     public String toString() {
-        return "range:" + String.valueOf(matchedRange) + "  value:" + output + "    " + template.toString();
+        return "range:" + String.valueOf(matchedRange) + "  value:" + foundValue + "    " + template.toString();
     }
 }

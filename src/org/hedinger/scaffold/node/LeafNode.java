@@ -12,6 +12,10 @@ public abstract class LeafNode extends AbstractNode {
         this.value = (value == null || value.isEmpty() ? VALUE_NULL : value);
     }
 
+    public String getValue() {
+        return value;
+    }
+    
     public abstract StringBounds matches(SmartBuffer body, StringBounds allowedRange) throws Exception;
 
     @Override

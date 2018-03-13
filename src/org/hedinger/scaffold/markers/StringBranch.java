@@ -6,6 +6,7 @@ import java.util.List;
 import org.hedinger.scaffold.node.AbstractNode;
 import org.hedinger.scaffold.node.BranchNode;
 import org.hedinger.scaffold.node.LeafNode;
+import org.hedinger.scaffold.utils.RandomTreeUtils;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.StringBounds;
 
@@ -22,7 +23,6 @@ public class StringBranch extends StringNode {
 
     private int repetition = 0;
     private int childIndex = 0;
-    private StringNode currentChild;
 
     private boolean done = false;
 
@@ -45,27 +45,31 @@ public class StringBranch extends StringNode {
     }
 
     @Override
-    public boolean grow(int step) throws Exception {
+    public int grow(int signal) throws Exception {
+
+        if (optional && childIndex == -1 && signal%2 == 0) {
+            done = true;
+        } else if (repetition > 0 && childIndex == 0 &&  signal%2 == 0) {
+            dropIncompleteChildSet();
+            done = true;
+        }
 
         if (done) {
-            return true;
+            return 0;
         }
 
-        if (currentChild == null) {
+        StringNode currentChild;
+        
+        if (childIndex == -1) {
             childIndex = 0;
-            currentChild = nextChild();
-        }
+        } 
+        
+        currentChild = nextChild();
 
-        boolean good = currentChild.grow(step);
+        int good = currentChild.grow(signal);
 
-        if (!good) {
-            // we over-reached; the leaf failed
-            if(optional || repetition >= 1) {
-                dropIncompleteChildSet();
-                done = true;
-                return true;
-            }
-            return false;
+        if (good == -1) {
+            return -1;
         }
 
         updateMaxRange(currentChild.getRange());
@@ -81,14 +85,12 @@ public class StringBranch extends StringNode {
                 // means we are done with a set
                 if (repetition == maxRepetitions || maxRepetitions == 0) {
                     done = true;
-                    return true;
+                    return 0;
                 }
             }
-
-            currentChild = nextChild();
         }
 
-        return true;
+        return 0;
     }
 
     private void dropIncompleteChildSet() {
@@ -115,6 +117,10 @@ public class StringBranch extends StringNode {
     }
 
     private StringNode nextChild() throws Exception {
+        int absoluteIndex = childIndex+ (repetition)*modulo;
+        if(absoluteIndex < children.size()) {
+            return children.get(absoluteIndex);
+        }
         StringNode nodeChild;
         AbstractNode templateChild = branchTemplate.getChildren().get(childIndex);
         if (templateChild instanceof BranchNode) {
@@ -161,6 +167,27 @@ public class StringBranch extends StringNode {
         return sum;
     }
 
+    @Override
+    public StringNode deepClone() {
+        StringBranch branch;
+        
+        if(parent == null) {
+            branch = new StringBranch(template, input);
+        } else {
+            branch = new StringBranch(template, parent, maxRange.start, maxRange.end);
+        }
+        branch.childIndex = this.childIndex;
+        branch.done = this.done;
+        branch.repetition = this.repetition;
+        branch.maxRange = new StringBounds(maxRange.start, maxRange.end);
+        
+        for(StringNode child : children) {
+            branch.children.add(child.deepClone());
+        }
+        
+        return branch;
+    }
+    
     @Override
     public String toString() {
         return "range:" + String.valueOf(maxRange) + "  " + template.toString();

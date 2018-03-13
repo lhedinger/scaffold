@@ -26,11 +26,7 @@ public abstract class StringNode {
         allowedRange = new StringBounds(start, end);
     }
 
-    public boolean growOne() throws Exception {
-        return grow(1);
-    }
-
-    public abstract boolean grow(int step) throws Exception;
+    public abstract int grow(int signal) throws Exception;
 
     public abstract boolean isDone();
 
@@ -41,5 +37,7 @@ public abstract class StringNode {
     public abstract String generateOutput();
 
     public abstract int calcCoverage();
+    
+    public abstract StringNode deepClone();
     
 }

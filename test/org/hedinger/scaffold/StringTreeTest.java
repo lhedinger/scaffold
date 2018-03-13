@@ -1,9 +1,10 @@
 package org.hedinger.scaffold;
 
-import org.hedinger.scaffold.markers.StringTree;
+import org.hedinger.scaffold.markers.StringForest;
 import org.hedinger.scaffold.node.AbstractNode;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.TemplateParser;
+import org.hedinger.scaffold.utils.TreePrinter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,9 +26,9 @@ public class StringTreeTest {
     }
 
     @Test
-    public void testBasic() throws Exception {
+    public void testTree_basic() throws Exception {
 
-        StringTree tree = new StringTree(template, new SmartBuffer("xAxBCZx"));
+        StringForest tree = new StringForest(template, new SmartBuffer("xAxBCZx"));
         tree.run();
         String output = tree.getOutput();
         float coverage = tree.getCoverage();
@@ -35,9 +36,9 @@ public class StringTreeTest {
     }
 
     @Test
-    public void testWithOptionals() throws Exception {
+    public void testTree_optionals() throws Exception {
 
-        StringTree tree = new StringTree(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+        StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
         tree.run();
         String output = tree.getOutput();
         float coverage = tree.getCoverage();
@@ -45,9 +46,9 @@ public class StringTreeTest {
     }
 
     @Test
-    public void testWithRepeating() throws Exception {
+    public void testTree_repeating() throws Exception {
 
-        StringTree tree = new StringTree(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+        StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
         tree.run();
         String output = tree.getOutput();
         float coverage = tree.getCoverage();
@@ -55,13 +56,20 @@ public class StringTreeTest {
     }
 
     @Test
-    public void testWithNoise() throws Exception {
+    public void testTree_noise() throws Exception {
 
-        StringTree tree = new StringTree(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+        StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
         tree.run();
         String output = tree.getOutput();
         float coverage = tree.getCoverage();
         print(output, coverage);
+    }
+    
+    @Test
+    public void testForest_Basic() throws Exception {
+
+        StringForest tree = new StringForest(template, new SmartBuffer("ABCZABBCBZ"));
+        tree.run();
     }
 
     private static void print(String output, float coverage) {
