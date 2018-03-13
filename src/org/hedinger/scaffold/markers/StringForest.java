@@ -10,24 +10,8 @@ public class StringForest {
     private static final int MAX_STEPS = 99999;
     private static final int MAX_TREES = 99999;
 
-    private TreeSet<StringTree> trees = new TreeSet<StringTree>(new Comparator<StringTree>() {
-        @Override
-        public int compare(StringTree o1, StringTree o2) {
-            if (o1.getCoverage() < 0) {
-                return 1;
-            }
-            if (o2.getCoverage() < 0) {
-                return -1;
-            }
-            if (o1.getCoverage() > o2.getCoverage()) {
-                return 1;
-            }
-            if (o1.getCoverage() < o2.getCoverage()) {
-                return -1;
-            }
-            return 1;
-        }
-    });
+    private TreeSet<StringTree> trees = new TreeSet<StringTree>(new TreeComparator());
+    private TreeSet<StringTree> finishedTrees = new TreeSet<StringTree>(new TreeComparator());
 
     private AbstractNode template;
     private SmartBuffer body;
@@ -50,9 +34,6 @@ public class StringForest {
 
             int out = tree.grow();
 
-            trees.remove(tree);
-            trees.add(tree);
-            
             if (out == -1) {
                 // TODO trees.remove(tree);
             } else {
@@ -60,8 +41,9 @@ public class StringForest {
                 trees.add(newTree);
             }
 
+            sortTree();
             tree = trees.first();
-            
+
             if (c > MAX_STEPS) {
                 throw new Exception("number of maximum grow steps exceeded");
             }
@@ -71,12 +53,45 @@ public class StringForest {
         }
     }
 
+    public void sortTree() {
+        TreeSet<StringTree> newTrees = new TreeSet<StringTree>(new TreeComparator());
+        for (StringTree tree : trees) {
+            if (tree.finished()) {
+                finishedTrees.add(tree);
+            } else {
+                newTrees.add(tree);
+            }
+        }
+        trees = newTrees;
+    }
+
     public SmartBuffer getBody() {
         return body;
     }
 
     public AbstractNode getTemplate() {
         return template;
+    }
+
+    private static class TreeComparator implements Comparator<StringTree> {
+
+        @Override
+        public int compare(StringTree o1, StringTree o2) {
+            if (o1.getCoverage() < 0) {
+                return 1; // move to end
+            }
+            if (o2.getCoverage() < 0) {
+                return -1; // move to end
+            }
+            if (o1.getCoverage() > o2.getCoverage()) {
+                return 1;
+            }
+            if (o1.getCoverage() < o2.getCoverage()) {
+                return -1;
+            }
+            return 1;
+        }
+
     }
 
 }

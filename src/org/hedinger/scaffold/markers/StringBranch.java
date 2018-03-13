@@ -6,7 +6,6 @@ import java.util.List;
 import org.hedinger.scaffold.node.AbstractNode;
 import org.hedinger.scaffold.node.BranchNode;
 import org.hedinger.scaffold.node.LeafNode;
-import org.hedinger.scaffold.utils.RandomTreeUtils;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.StringBounds;
 
@@ -22,7 +21,7 @@ public class StringBranch extends StringNode {
     private final int modulo;
 
     private int repetition = 0;
-    private int childIndex = 0;
+    private int childIterator = -1;
 
     private boolean done = false;
 
@@ -47,10 +46,10 @@ public class StringBranch extends StringNode {
     @Override
     public int grow(int signal) throws Exception {
 
-        if (optional && childIndex == -1 && signal%2 == 0) {
+        //FIXME top level node forking
+        if (optional && childIterator == -1 && signal % 2 == 0) {
             done = true;
-        } else if (repetition > 0 && childIndex == 0 &&  signal%2 == 0) {
-            dropIncompleteChildSet();
+        } else if (repetition > 0 && childIterator == 0 && signal % 2 == 0) {
             done = true;
         }
 
@@ -59,11 +58,11 @@ public class StringBranch extends StringNode {
         }
 
         StringNode currentChild;
-        
-        if (childIndex == -1) {
-            childIndex = 0;
-        } 
-        
+
+        if (childIterator == -1) {
+            childIterator = 0;
+        }
+
         currentChild = nextChild();
 
         int good = currentChild.grow(signal);
@@ -75,13 +74,13 @@ public class StringBranch extends StringNode {
         updateMaxRange(currentChild.getRange());
 
         if (currentChild.isDone()) {
-            childIndex++;
-            if (childIndex >= modulo) {
-                childIndex = 0;
+            childIterator++;
+            if (childIterator >= modulo) {
+                childIterator = 0;
                 repetition++;
             }
 
-            if (childIndex == 0) {
+            if (childIterator == 0) {
                 // means we are done with a set
                 if (repetition == maxRepetitions || maxRepetitions == 0) {
                     done = true;
@@ -94,7 +93,7 @@ public class StringBranch extends StringNode {
     }
 
     private void dropIncompleteChildSet() {
-        for (int i = 0; i <= childIndex; i++) {
+        for (int i = 0; i <= childIterator; i++) {
             children.remove(children.size() - 1);
         }
     }
@@ -117,12 +116,12 @@ public class StringBranch extends StringNode {
     }
 
     private StringNode nextChild() throws Exception {
-        int absoluteIndex = childIndex+ (repetition)*modulo;
-        if(absoluteIndex < children.size()) {
+        int absoluteIndex = childIterator + (repetition) * modulo;
+        if (absoluteIndex < children.size()) {
             return children.get(absoluteIndex);
         }
         StringNode nodeChild;
-        AbstractNode templateChild = branchTemplate.getChildren().get(childIndex);
+        AbstractNode templateChild = branchTemplate.getChildren().get(childIterator);
         if (templateChild instanceof BranchNode) {
             nodeChild = new StringBranch(templateChild, this, maxRange.end, StringBounds.UNDEF);
         } else if (templateChild instanceof LeafNode) {
@@ -170,26 +169,27 @@ public class StringBranch extends StringNode {
     @Override
     public StringNode deepClone() {
         StringBranch branch;
-        
-        if(parent == null) {
+
+        if (parent == null) {
             branch = new StringBranch(template, input);
         } else {
             branch = new StringBranch(template, parent, maxRange.start, maxRange.end);
         }
-        branch.childIndex = this.childIndex;
+        branch.childIterator = this.childIterator;
         branch.done = this.done;
         branch.repetition = this.repetition;
         branch.maxRange = new StringBounds(maxRange.start, maxRange.end);
-        
-        for(StringNode child : children) {
+
+        for (StringNode child : children) {
             branch.children.add(child.deepClone());
         }
-        
+
         return branch;
     }
-    
+
     @Override
     public String toString() {
-        return "range:" + String.valueOf(maxRange) + "  " + template.toString();
+        return "range:" + String.valueOf(maxRange) + "  "
+                + template.toString() + "\t\t" + (done ? "x" : "") + " ci=" + childIterator;
     }
 }

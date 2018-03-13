@@ -4,7 +4,6 @@ import org.hedinger.scaffold.markers.StringForest;
 import org.hedinger.scaffold.node.AbstractNode;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.TemplateParser;
-import org.hedinger.scaffold.utils.TreePrinter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,9 +29,6 @@ public class StringTreeTest {
 
         StringForest tree = new StringForest(template, new SmartBuffer("xAxBCZx"));
         tree.run();
-        String output = tree.getOutput();
-        float coverage = tree.getCoverage();
-        print(output, coverage);
     }
 
     @Test
@@ -40,9 +36,6 @@ public class StringTreeTest {
 
         StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
         tree.run();
-        String output = tree.getOutput();
-        float coverage = tree.getCoverage();
-        print(output, coverage);
     }
 
     @Test
@@ -50,9 +43,6 @@ public class StringTreeTest {
 
         StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
         tree.run();
-        String output = tree.getOutput();
-        float coverage = tree.getCoverage();
-        print(output, coverage);
     }
 
     @Test
@@ -60,9 +50,6 @@ public class StringTreeTest {
 
         StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
         tree.run();
-        String output = tree.getOutput();
-        float coverage = tree.getCoverage();
-        print(output, coverage);
     }
     
     @Test

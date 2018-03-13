@@ -25,12 +25,11 @@ public class StringTree {
     public int grow() throws Exception {
         int out = root.grow(signal);
         coverage = root.calcCoverage();
-        signal = 0;
 
         if (out < 0) {
             coverage = -1; // failed
         }
-        if (out > 0) {
+        if (out > 0 || root.isDone()) {
             finished = true;
         }
         return out;
@@ -39,12 +38,18 @@ public class StringTree {
     public StringTree deepClone() {
         StringNode clonedRoot = root.deepClone();
         StringTree tree = new StringTree(forest, clonedRoot);
+        tree.coverage = coverage;
         tree.signal = 1;
+        signal = 0;
         return tree;
     }
 
     public boolean finished() {
-        return finished;
+        return root.isDone();
+    }
+
+    public boolean failed() {
+        return (coverage == -1);
     }
 
     public String getOutput() {
@@ -57,7 +62,7 @@ public class StringTree {
 
     @Override
     public String toString() {
-        return "\n(" + coverage + ")   " + TreePrinter.print(root);
+        return "\n(" + coverage + ")  s" + signal + "  " + TreePrinter.print(root);
     }
 
 }
