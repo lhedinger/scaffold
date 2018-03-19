@@ -1,5 +1,10 @@
 package org.hedinger.scaffold.markers;
 
+import static org.hedinger.scaffold.markers.Status.CLOSED;
+import static org.hedinger.scaffold.markers.Status.FAILED;
+import static org.hedinger.scaffold.markers.Status.FORK;
+import static org.hedinger.scaffold.markers.Status.OPEN;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +26,16 @@ public class StringBranch extends StringNode {
     private final int modulo;
 
     private int repetition = 0;
-    private int childIterator = -1;
+    private int childIterator = -2;
 
     private boolean done = false;
+    private boolean skipReq = false;
 
     public StringBranch(AbstractNode template, SmartBuffer input) {
         super(template, input);
         branchTemplate = (BranchNode) template;
         optional = branchTemplate.isOptional();
-        maxRepetitions = branchTemplate.getRepetitions();
+        maxRepetitions = branchTemplate.getMaxRepetitions();
         modulo = branchTemplate.getChildren().size();
         maxRange = new StringBounds(0, 0);
     }
@@ -38,64 +44,55 @@ public class StringBranch extends StringNode {
         super(template, parent, start, end);
         branchTemplate = (BranchNode) template;
         optional = branchTemplate.isOptional();
-        maxRepetitions = branchTemplate.getRepetitions();
+        maxRepetitions = branchTemplate.getMaxRepetitions();
         modulo = branchTemplate.getChildren().size();
         maxRange = new StringBounds(start, start);
     }
 
     @Override
-    public int grow(int signal) throws Exception {
-
-        //FIXME top level node forking
-        if (optional && childIterator == -1 && signal % 2 == 0) {
-            done = true;
-        } else if (repetition > 0 && childIterator == 0 && signal % 2 == 0) {
-            done = true;
-        }
-
-        if (done) {
-            return 0;
-        }
-
-        StringNode currentChild;
+    public Status grow(int signal) throws Exception {
 
         if (childIterator == -1) {
+            if (optional || repetition > 0) {
+                if (signal % 2 == 0) {
+                    childIterator = -9;
+                    return CLOSED;
+                }
+            }
+            childIterator = 0;
+        }
+        if (childIterator == -2) {
+            if (optional || repetition > 0) {
+                childIterator = -1;
+                return FORK;
+            }
             childIterator = 0;
         }
 
-        currentChild = nextChild();
+        StringNode currentChild = nextChild();
 
-        int good = currentChild.grow(signal);
-
-        if (good == -1) {
-            return -1;
-        }
-
+        Status status = currentChild.grow(signal);
         updateMaxRange(currentChild.getRange());
 
-        if (currentChild.isDone()) {
+        if (status == OPEN || status == FORK || status == FAILED) {
+            return status;
+        }
+
+        if (status == CLOSED) {
             childIterator++;
             if (childIterator >= modulo) {
-                childIterator = 0;
+                childIterator = -2;
                 repetition++;
             }
-
-            if (childIterator == 0) {
-                // means we are done with a set
-                if (repetition == maxRepetitions || maxRepetitions == 0) {
-                    done = true;
-                    return 0;
-                }
-            }
         }
 
-        return 0;
-    }
 
-    private void dropIncompleteChildSet() {
-        for (int i = 0; i <= childIterator; i++) {
-            children.remove(children.size() - 1);
+
+        if (repetition >= maxRepetitions && childIterator == -1 && maxRepetitions >= 0) {
+            return CLOSED;
         }
+
+        return OPEN;
     }
 
     private void updateMaxRange(StringBounds childRange) {

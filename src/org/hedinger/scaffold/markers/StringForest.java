@@ -32,17 +32,23 @@ public class StringForest {
         int c = 0;
         while (!tree.finished()) {
 
-            int out = tree.grow();
+            Status out = tree.grow();
 
-            if (out == -1) {
-                // TODO trees.remove(tree);
-            } else {
+            if (out == Status.FORK) {
                 StringTree newTree = tree.deepClone();
                 trees.add(newTree);
             }
 
             sortTree();
+
+            if (trees.size() == 0) {
+                return;
+            }
             tree = trees.first();
+
+            if(tree.getCoverage() > 10) {
+                System.out.println("");
+            }
 
             if (c > MAX_STEPS) {
                 throw new Exception("number of maximum grow steps exceeded");
@@ -58,7 +64,7 @@ public class StringForest {
         for (StringTree tree : trees) {
             if (tree.finished()) {
                 finishedTrees.add(tree);
-            } else {
+            } else if (!tree.failed()) {
                 newTrees.add(tree);
             }
         }
@@ -84,10 +90,10 @@ public class StringForest {
                 return -1; // move to end
             }
             if (o1.getCoverage() > o2.getCoverage()) {
-                return 1;
+                return -1;
             }
             if (o1.getCoverage() < o2.getCoverage()) {
-                return -1;
+                return 1;
             }
             return 1;
         }

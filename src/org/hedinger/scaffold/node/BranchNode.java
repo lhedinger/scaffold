@@ -34,6 +34,10 @@ public class BranchNode extends AbstractNode {
         return repMax - repMin;
     }
 
+    public int getMaxRepetitions() {
+        return repMax;
+    }
+    
     public boolean isOptional() {
         return (repMin == 0);
     }

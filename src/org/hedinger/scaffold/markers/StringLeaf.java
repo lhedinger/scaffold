@@ -1,5 +1,8 @@
 package org.hedinger.scaffold.markers;
 
+import static org.hedinger.scaffold.markers.Status.CLOSED;
+import static org.hedinger.scaffold.markers.Status.FAILED;
+
 import java.util.List;
 
 import org.hedinger.scaffold.node.AbstractNode;
@@ -19,7 +22,7 @@ public class StringLeaf extends StringNode {
     }
 
     @Override
-    public int grow(int step) throws Exception {
+    public Status grow(int step) throws Exception {
 
         if (matchedRange != null) {
             throw new Exception("this leaf has already grown");
@@ -27,11 +30,11 @@ public class StringLeaf extends StringNode {
 
         matchedRange = leafTemplate.matches(input, allowedRange);
         foundValue = input.substring(matchedRange);
-        
-       if (matchedRange == null) {
-           return -1;
-       }
-       return 1;
+
+        if (matchedRange == null) {
+            return FAILED;
+        }
+        return CLOSED;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class StringLeaf extends StringNode {
         leaf.foundValue = this.foundValue;
         return leaf;
     }
-    
+
     @Override
     public String toString() {
         return "range:" + String.valueOf(matchedRange) + "  value:" + foundValue + "    " + template.toString();

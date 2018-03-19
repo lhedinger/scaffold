@@ -1,8 +1,11 @@
 package org.hedinger.scaffold.markers;
 
+
 import org.hedinger.scaffold.utils.TreePrinter;
 
 public class StringTree {
+
+    private static int INCREMENTER = 0;
 
     private StringForest forest;
     private StringNode root;
@@ -12,26 +15,45 @@ public class StringTree {
 
     private boolean finished = false;
 
+    private final int id;
+
+    private String history = "";
+
     public StringTree(StringForest forest) {
         this.forest = forest;
         root = new StringBranch(forest.getTemplate(), forest.getBody());
+        this.id = INCREMENTER++;
+        history += toString();
     }
 
     public StringTree(StringForest forest, StringNode root) {
         this.forest = forest;
         this.root = root;
+        this.id = INCREMENTER++;
+        history += toString();
     }
 
-    public int grow() throws Exception {
-        int out = root.grow(signal);
+    public Status grow() throws Exception {
+        Status out = root.grow(signal);
         coverage = root.calcCoverage();
 
-        if (out < 0) {
-            coverage = -1; // failed
+        switch (out) {
+            case FAILED:
+                coverage = -1;
+                break;
+            case OPEN:
+                break;
+            case FORK:
+                break;
+            case CLOSED:
+                finished = true;
+                break;
         }
-        if (out > 0 || root.isDone()) {
+        if (root.isDone()) {
             finished = true;
         }
+
+        history += toString();
         return out;
     }
 
@@ -41,11 +63,12 @@ public class StringTree {
         tree.coverage = coverage;
         tree.signal = 1;
         signal = 0;
+        tree.history = history;
         return tree;
     }
 
     public boolean finished() {
-        return root.isDone();
+        return finished;
     }
 
     public boolean failed() {
@@ -62,7 +85,7 @@ public class StringTree {
 
     @Override
     public String toString() {
-        return "\n(" + coverage + ")  s" + signal + "  " + TreePrinter.print(root);
+        return "\n(" + coverage + ")  s" + signal + "  id=" + id + " " + TreePrinter.print(root);
     }
 
 }
