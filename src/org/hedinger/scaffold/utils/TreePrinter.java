@@ -8,59 +8,59 @@ import org.hedinger.scaffold.node.BranchNode;
 
 public class TreePrinter {
 
-    public static String print(AbstractNode root) {
-        StringBuilder sb = new StringBuilder();
+	public static String print(AbstractNode root) {
+		StringBuilder sb = new StringBuilder();
 
-        printTreeHelper(root, 0, sb);
+		printTreeHelper(root, 0, sb);
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    public static String print(StringNode root) {
-        StringBuilder sb = new StringBuilder();
+	public static String print(StringNode root) {
+		StringBuilder sb = new StringBuilder();
 
-        printTreeHelper(root, 0, sb);
+		printTreeHelper(root, 0, sb);
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    private static void printTreeHelper(AbstractNode node, int tabs, StringBuilder sb) {
-        sb.append('\n');
+	private static void printTreeHelper(AbstractNode node, int tabs, StringBuilder sb) {
+		sb.append('\n');
 
-        for (int i = 0; i < tabs; i++) {
-            sb.append('\t');
-        }
+		for (int i = 0; i < tabs; i++) {
+			sb.append('\t');
+		}
 
-        sb.append(node.toString());
+		sb.append(node.toString());
 
-        if (node instanceof BranchNode) {
-            BranchNode branch = (BranchNode) node;
+		if (node instanceof BranchNode) {
+			BranchNode branch = (BranchNode) node;
 
-            AbstractNode n = branch.getFirst();
+			AbstractNode n = branch.getFirst();
 
-            while (n != null) {
-                printTreeHelper(n, tabs + 1, sb);
+			while (n != null) {
+				printTreeHelper(n, tabs + 1, sb);
 
-                n = branch.getNext();
-            }
-        }
-    }
+				n = branch.getNext();
+			}
+		}
+	}
 
-    private static void printTreeHelper(StringNode node, int tabs, StringBuilder sb) {
-        sb.append('\n');
+	private static void printTreeHelper(StringNode node, int tabs, StringBuilder sb) {
+		sb.append('\n');
 
-        for (int i = 0; i < tabs; i++) {
-            sb.append('\t');
-        }
+		for (int i = 0; i < tabs; i++) {
+			sb.append('\t');
+		}
 
-        sb.append(node.toString());
+		sb.append(node.toString());
 
-        List<StringNode> children = node.getChildren();
+		List<StringNode> children = node.getChildren();
 
-        if (children != null) {
-            for (StringNode child : children) {
-                printTreeHelper(child, tabs + 1, sb);
-            }
-        }
-    }
+		if (children != null) {
+			for (StringNode child : children) {
+				printTreeHelper(child, tabs + 1, sb);
+			}
+		}
+	}
 }

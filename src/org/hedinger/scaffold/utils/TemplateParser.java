@@ -83,7 +83,7 @@ public class TemplateParser {
 		while ((c_int = br.read()) != -1) {
 			char c = (char) c_int;
 
-			//System.out.print(c);
+			// System.out.print(c);
 
 			switch (state) {
 			case -1: {
@@ -132,7 +132,7 @@ public class TemplateParser {
 		while ((c_int = br.read()) != -1) {
 			char c = (char) c_int;
 
-			//System.out.print(c);
+			// System.out.print(c);
 
 			switch (state) {
 			case -1: {

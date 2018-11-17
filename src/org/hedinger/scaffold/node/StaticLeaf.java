@@ -5,27 +5,27 @@ import org.hedinger.scaffold.utils.StringBounds;
 
 public class StaticLeaf extends LeafNode {
 
-    private final int length;
-    
-    public StaticLeaf(String value) {
-        super(value);
-        length = value.length();
-    }
+	private final int length;
 
-    @Override
-    public StringBounds matches(SmartBuffer body, StringBounds allowedRange) throws Exception {
+	public StaticLeaf(String value) {
+		super(value);
+		length = value.length();
+	}
 
-        int i = body.indexOf(value, allowedRange.start);
+	@Override
+	public StringBounds matches(SmartBuffer body, StringBounds allowedRange) throws Exception {
 
-        if (i == -1)
-            return null;
+		int i = body.indexOf(value, allowedRange.start);
 
-        StringBounds output = new StringBounds(i, i + length);
+		if (i == -1)
+			return null;
 
-        if (!output.subsetOf(allowedRange)) {
-            return null;
-        }
+		StringBounds output = new StringBounds(i, i + length);
 
-        return output;
-    }
+		if (!output.subsetOf(allowedRange)) {
+			return null;
+		}
+
+		return output;
+	}
 }

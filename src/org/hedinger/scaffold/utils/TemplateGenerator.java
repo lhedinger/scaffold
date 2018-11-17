@@ -12,55 +12,53 @@ import org.hedinger.scaffold.node.Template;
 
 public class TemplateGenerator {
 
-    private TreeSet<Template> templates = new TreeSet<Template>(new TreeComparator());
+	private TreeSet<Template> templates = new TreeSet<Template>(new TreeComparator());
 
-    private List<String> samples = new ArrayList<String>();
+	private List<String> samples = new ArrayList<String>();
 
-    private Map<Integer, String> tokens = new HashMap<Integer, String>();
+	private Map<Integer, String> tokens = new HashMap<Integer, String>();
 
-    public TemplateGenerator() {
+	public TemplateGenerator() {
 
-    }
+	}
 
-    public void addSample(String sample) {
-        samples.add(sample);
-    }
+	public void addSample(String sample) {
+		samples.add(sample);
+	}
 
-    public AbstractNode generateTemplate() {
-        return null;
-    }
+	public AbstractNode generateTemplate() {
+		return null;
+	}
 
+	public void tokenize() {
 
-    public void tokenize() {
+	}
 
+	private static class Sample {
 
-    }
+		private String sample;
 
-    private static class Sample {
+	}
 
-        private String sample;
+	private static class TreeComparator implements Comparator<Template> {
 
-    }
+		@Override
+		public int compare(Template o1, Template o2) {
+			if (o1.getScore() < 0) {
+				return 1; // move to end
+			}
+			if (o2.getScore() < 0) {
+				return -1; // move to end
+			}
+			if (o1.getScore() > o2.getScore()) {
+				return -1;
+			}
+			if (o1.getScore() < o2.getScore()) {
+				return 1;
+			}
+			return 1;
+		}
 
-    private static class TreeComparator implements Comparator<Template> {
-
-        @Override
-        public int compare(Template o1, Template o2) {
-            if (o1.getScore() < 0) {
-                return 1; // move to end
-            }
-            if (o2.getScore() < 0) {
-                return -1; // move to end
-            }
-            if (o1.getScore() > o2.getScore()) {
-                return -1;
-            }
-            if (o1.getScore() < o2.getScore()) {
-                return 1;
-            }
-            return 1;
-        }
-
-    }
+	}
 
 }

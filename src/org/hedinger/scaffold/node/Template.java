@@ -3,26 +3,26 @@ package org.hedinger.scaffold.node;
 import org.hedinger.scaffold.utils.TreePrinter;
 
 public class Template {
-    private AbstractNode root;
+	private AbstractNode root;
 
-    public Template() {
-    }
+	public Template() {
+	}
 
-    public AbstractNode getRoot() {
-        return root;
-    }
+	public AbstractNode getRoot() {
+		return root;
+	}
 
-    public void setRoot(AbstractNode root) {
-        this.root = root;
-    }
+	public void setRoot(AbstractNode root) {
+		this.root = root;
+	}
 
-    public int getScore() {
-        return 0;
-    }
+	public int getScore() {
+		return 0;
+	}
 
-    @Override
-    public String toString() {
-        return TreePrinter.print(root);
-    }
+	@Override
+	public String toString() {
+		return TreePrinter.print(root);
+	}
 
 }
