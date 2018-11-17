@@ -11,73 +11,82 @@ import org.hedinger.scaffold.utils.StringBounds;
 
 public class StringLeaf extends StringNode {
 
-    private LeafNode leafTemplate;
-    private StringBounds matchedRange;
+	private LeafNode leafTemplate;
+	private StringBounds matchedRange;
 
-    private String foundValue;
+	private String foundValue;
 
-    public StringLeaf(AbstractNode template, StringNode parent, int start, int end) {
-        super(template, parent, start, end);
-        leafTemplate = (LeafNode) template;
-    }
+	public StringLeaf(AbstractNode template, StringNode parent, int start, int end) {
+		super(template, parent, start, end);
+		leafTemplate = (LeafNode) template;
+	}
 
-    @Override
-    public Status grow(int step) throws Exception {
+	@Override
+	public Status grow(int step) throws Exception {
 
-        if (matchedRange != null) {
-            throw new Exception("this leaf has already grown");
-        }
+		if (matchedRange != null) {
+			throw new Exception("this leaf has already grown");
+		}
 
-        matchedRange = leafTemplate.matches(input, allowedRange);
-        foundValue = input.substring(matchedRange);
+		matchedRange = leafTemplate.matches(input, allowedRange);
+		foundValue = input.substring(matchedRange);
 
-        if (matchedRange == null) {
-            return FAILED;
-        }
-        return CLOSED;
-    }
+		if (matchedRange == null) {
+			return FAILED;
+		}
+		return CLOSED;
+	}
 
-    @Override
-    public boolean isDone() {
-        return matchedRange != null;
-    }
+	@Override
+	public boolean isDone() {
+		return matchedRange != null;
+	}
 
-    @Override
-    public List<StringNode> getChildren() {
-        return null;
-    }
+	@Override
+	public List<StringNode> getChildren() {
+		return null;
+	}
 
-    @Override
-    public String generateOutput() {
-        return foundValue;
-    }
+	@Override
+	public String generateOutput() {
+		return foundValue;
+	}
 
-    @Override
-    public StringBounds getRange() {
-        return matchedRange;
-    }
+	@Override
+	public String generateAnnotatedOutput() {
+		return foundValue;
+	}
 
-    @Override
-    public int calcCoverage() {
-        if (matchedRange == null) {
-            return 0;
-        }
-        if (!matchedRange.isFinite()) {
-            return 0;
-        }
-        return (matchedRange.end - matchedRange.start);
-    }
+	@Override
+	public void find(List<String> result, String query) {
+	}
 
-    @Override
-    public StringNode deepClone() {
-        StringLeaf leaf = new StringLeaf(template, parent, allowedRange.start, allowedRange.end);
-        leaf.matchedRange = new StringBounds(matchedRange.start, matchedRange.end);
-        leaf.foundValue = this.foundValue;
-        return leaf;
-    }
+	@Override
+	public StringBounds getRange() {
+		return matchedRange;
+	}
 
-    @Override
-    public String toString() {
-        return "range:" + String.valueOf(matchedRange) + "  value:" + foundValue + "    " + template.toString();
-    }
+	@Override
+	public int calcCoverage() {
+		if (matchedRange == null) {
+			return 0;
+		}
+		if (!matchedRange.isFinite()) {
+			return 0;
+		}
+		return (matchedRange.end - matchedRange.start);
+	}
+
+	@Override
+	public StringNode deepClone() {
+		StringLeaf leaf = new StringLeaf(template, parent, allowedRange.start, allowedRange.end);
+		leaf.matchedRange = new StringBounds(matchedRange.start, matchedRange.end);
+		leaf.foundValue = this.foundValue;
+		return leaf;
+	}
+
+	@Override
+	public String toString() {
+		return "range:" + String.valueOf(matchedRange) + "  value:" + foundValue + "    " + template.toString();
+	}
 }
