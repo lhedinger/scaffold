@@ -3,6 +3,7 @@ package org.hedinger.scaffold;
 import static java.util.Arrays.asList;
 
 import java.io.File;
+import java.io.FileReader;
 
 import org.hedinger.scaffold.markers.StringForest;
 import org.hedinger.scaffold.node.AbstractNode;
@@ -16,22 +17,13 @@ import org.junit.Test;
 
 public class StringTreeTest {
 
-	private Template template;
-
 	@Before
 	public void setUp() throws Exception {
-		template = generateTemplate("test/templ1");
-		// System.out.println(TreePrinter.print(template));
-	}
-
-	@Test
-	public void testSetup() {
-
 	}
 
 	@Test
 	public void testTree_basic() throws Exception {
-		StringForest tree = new StringForest(template, new SmartBuffer("xAxBCZx"));
+		StringForest tree = new StringForest(generateTemplate("test/templ1"), new SmartBuffer("xAxBCZx"));
 		tree.run();
 
 		Assert.assertEquals("ABCZ", tree.getBest().generateOutput());
@@ -40,19 +32,19 @@ public class StringTreeTest {
 
 	@Test
 	public void testTree_optionals() throws Exception {
-		StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+		StringForest tree = new StringForest(generateTemplate("test/templ1"), new SmartBuffer("AxBCZABxBCBZZCZx"));
 		tree.run();
 	}
 
 	@Test
 	public void testTree_repeating() throws Exception {
-		StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+		StringForest tree = new StringForest(generateTemplate("test/templ1"), new SmartBuffer("AxBCZABxBCBZZCZx"));
 		tree.run();
 	}
 
 	@Test
 	public void testTree_noise() throws Exception {
-		StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+		StringForest tree = new StringForest(generateTemplate("test/templ1"), new SmartBuffer("AxBCZABxBCBZZCZx"));
 		tree.run();
 
 		Assert.assertEquals("ABCZABBCBCZ", tree.getBest().generateOutput());
@@ -60,8 +52,27 @@ public class StringTreeTest {
 	}
 
 	@Test
+	public void testTree_file() throws Exception {
+		StringForest tree = new StringForest(generateTemplate("test/templ1"),
+				new SmartBuffer(new FileReader("test/input1")));
+		tree.run();
+
+		Assert.assertEquals("ABCZABBCBCZ", tree.getBest().generateOutput());
+		Assert.assertEquals(11, tree.getBest().getCoverage());
+	}
+
+	@Test
+	public void testTree_newlines() throws Exception {
+		StringForest tree = new StringForest(generateTemplate("test/templ6"), new SmartBuffer("AB534ZAB96Z"));
+		tree.run();
+
+		Assert.assertEquals("AB534ZAB96Z", tree.getBest().generateOutput());
+		Assert.assertEquals(11, tree.getBest().getCoverage());
+	}
+
+	@Test
 	public void testForest_Basic() throws Exception {
-		StringForest tree = new StringForest(template, new SmartBuffer("AxBCZABxBCBZZCZx"));
+		StringForest tree = new StringForest(generateTemplate("test/templ1"), new SmartBuffer("AxBCZABxBCBZZCZx"));
 		tree.run();
 
 		Assert.assertEquals("ABCZABBCBCZ", tree.getBest().generateOutput());

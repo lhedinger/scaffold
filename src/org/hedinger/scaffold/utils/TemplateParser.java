@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.hedinger.scaffold.node.AbstractNode;
 import org.hedinger.scaffold.node.BranchNode;
 import org.hedinger.scaffold.node.NewlineLeaf;
+import org.hedinger.scaffold.node.RegexLeaf;
 import org.hedinger.scaffold.node.StaticLeaf;
 import org.hedinger.scaffold.node.Template;
 
@@ -137,7 +138,7 @@ public class TemplateParser {
 			switch (state) {
 			case -1: {
 				if (c == '%') {
-					generateStatic(body.trim(), parentVarName);
+					generateStatic(body.trim(), parentVarName, parentVarType);
 					body = "";
 					state = 0;
 				} else if (c == ']') {
@@ -189,7 +190,7 @@ public class TemplateParser {
 			}
 			case 3: {
 				if (c == '%') {
-					generateStatic(body.trim(), parentVarName);
+					generateStatic(body.trim(), parentVarName, parentVarType);
 					varType = "";
 					body = "";
 					state = -1;
@@ -213,7 +214,7 @@ public class TemplateParser {
 		return name;
 	}
 
-	private void generateStatic(String body, String parent) throws Exception {
+	private void generateStatic(String body, String parent, String parentType) throws Exception {
 		if (body.trim().isEmpty()) {
 			return;
 		}
@@ -221,7 +222,11 @@ public class TemplateParser {
 		anonymousCount++;
 		String name = "static=" + anonymousCount;
 
-		slotMap.put(name, new StaticLeaf(body.trim()));
+		if (parentType.equals("R")) {
+			slotMap.put(name, new RegexLeaf(body.trim()));
+		} else {
+			slotMap.put(name, new StaticLeaf(body.trim()));
+		}
 
 		linkChildHelper(name, parent);
 	}
@@ -257,6 +262,9 @@ public class TemplateParser {
 		}
 		if (type.equals("O")) {
 			node = new BranchNode(name, 0, 1);
+		}
+		if (type.equals("R")) {
+			node = new BranchNode(name, 1, 1);
 		}
 
 		if (node == null) {

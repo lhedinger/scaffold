@@ -13,7 +13,7 @@ public class RegexLeaf extends LeafNode {
 	public StringBounds matches(SmartBuffer body, StringBounds allowedRange) throws Exception {
 		StringBounds output = body.firstMatch(value, allowedRange.start);
 
-		if (!output.subsetOf(allowedRange)) {
+		if (output == null || !output.subsetOf(allowedRange)) {
 			return null;
 		}
 
