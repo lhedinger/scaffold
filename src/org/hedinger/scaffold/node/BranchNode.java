@@ -2,6 +2,7 @@ package org.hedinger.scaffold.node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class BranchNode extends AbstractNode {
 	private static final int INFINITY = -1;
@@ -11,20 +12,20 @@ public class BranchNode extends AbstractNode {
 	private ArrayList<AbstractNode> children = new ArrayList<AbstractNode>();
 	private int childCrawler = 0;
 
-	public BranchNode(String name) {
-		super(name);
+	public BranchNode(String name, Set<Flag> flags) {
+		super(name, flags);
 		repMin = 1;
 		repMax = 1;
 	}
 
-	public BranchNode(String name, int min) {
-		super(name);
+	public BranchNode(String name, int min, Set<Flag> flags) {
+		super(name, flags);
 		repMin = (min < 0 ? 0 : min);
 		repMax = INFINITY;
 	}
 
-	public BranchNode(String name, int min, int max) {
-		super(name);
+	public BranchNode(String name, int min, int max, Set<Flag> flags) {
+		super(name, flags);
 		repMin = (min < 0 ? 0 : min);
 		repMax = (max < 0 ? INFINITY : max);
 	}
@@ -43,6 +44,11 @@ public class BranchNode extends AbstractNode {
 
 	public boolean isOptional() {
 		return (repMin == 0);
+	}
+
+	@Override
+	public boolean isStrict() {
+		return hasFlag(Flag.STRICT);
 	}
 
 	public void addNode(AbstractNode node) {
@@ -73,7 +79,7 @@ public class BranchNode extends AbstractNode {
 
 	@Override
 	public String toString() {
-		return "BranchNode_" + id + "  [" + repMin + "-" + (repMax == INFINITY ? "INF" : repMax) + "]";
+		return super.toString() + "  {" + repMin + "," + (repMax == INFINITY ? "INF" : repMax) + "}";
 	}
 
 }

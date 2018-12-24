@@ -101,7 +101,7 @@ public class StringTree {
 
 	@Override
 	public String toString() {
-		return "\n(" + coverage + ")  s" + signal + "  id=" + id + " " + TreePrinter.print(root);
+		return "\n(covrg=" + coverage + ")  s" + signal + "  id=" + id + " " + TreePrinter.print(root);
 	}
 
 }

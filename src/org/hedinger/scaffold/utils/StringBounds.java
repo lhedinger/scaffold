@@ -19,15 +19,25 @@ public class StringBounds {
 		if (start < superset.start) {
 			return false;
 		}
-
 		if (superset.end == UNDEF) {
 			return true;
 		}
-
 		if (end > superset.end) {
 			return false;
 		}
+		return true;
+	}
 
+	public boolean exactMatchOf(StringBounds superset) {
+		if (start != superset.start) {
+			return false;
+		}
+		if (superset.end == UNDEF) {
+			return true;
+		}
+		if (end != superset.end) {
+			return false;
+		}
 		return true;
 	}
 

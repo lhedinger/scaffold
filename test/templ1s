@@ -1,4 +1,4 @@
-%M:root:strict[
+%M:root[
 %[zero]%
 ]%
 
@@ -14,6 +14,6 @@ A%[one]%Z
 B%[three]%
 ]%
 
-%R:three:strict[
-[0-9]+
+%O:three:strict[
+C
 ]%

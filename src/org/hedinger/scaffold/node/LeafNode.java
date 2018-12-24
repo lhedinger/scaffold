@@ -25,6 +25,11 @@ public abstract class LeafNode extends AbstractNode {
 	}
 
 	@Override
+	public boolean isStrict() {
+		return parent.isStrict();
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + " value='" + value + "'";
 	}

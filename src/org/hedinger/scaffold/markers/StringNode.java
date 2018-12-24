@@ -16,7 +16,7 @@ public abstract class StringNode {
 		this.template = template;
 		this.input = input;
 		this.parent = null;
-		allowedRange = new StringBounds(0, StringBounds.UNDEF);
+		allowedRange = new StringBounds(0, input.length());
 	}
 
 	public StringNode(AbstractNode template, StringNode parent, int start, int end) {
@@ -24,6 +24,10 @@ public abstract class StringNode {
 		this.input = parent.input;
 		this.parent = parent;
 		allowedRange = new StringBounds(start, end);
+	}
+
+	public boolean isStrict() {
+		return template.isStrict();
 	}
 
 	public abstract Status grow(int signal) throws Exception;

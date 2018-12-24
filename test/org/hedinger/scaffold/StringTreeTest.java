@@ -80,6 +80,15 @@ public class StringTreeTest {
 	}
 
 	@Test
+	public void testForest_BasicStrict() throws Exception {
+		StringForest tree = new StringForest(generateTemplate("test/templ1s"), new SmartBuffer("xABCZxAZ"));
+		tree.run();
+
+		Assert.assertEquals("ABCZAZ", tree.getBest().generateOutput());
+		Assert.assertEquals(6, tree.getBest().getCoverage());
+	}
+
+	@Test
 	public void test_scoring() throws Exception {
 
 		String sample = "ABCZABBZ";
@@ -119,9 +128,9 @@ public class StringTreeTest {
 		bctree.run();
 
 		String query = "root";
-		Assert.assertEquals(asList("ABCZABBZ"), alltree.getBest().find(query));
-		Assert.assertEquals(asList("AXZAZ"), aztree.getBest().find(query));
-		Assert.assertEquals(asList("ABAB"), abtree.getBest().find(query));
+		Assert.assertEquals(asList("ABCZ", "ABBZ"), alltree.getBest().find(query));
+		Assert.assertEquals(asList("AXZ", "AZ"), aztree.getBest().find(query));
+		Assert.assertEquals(asList("AB", "AB"), abtree.getBest().find(query));
 		Assert.assertEquals(asList("BXC"), bctree.getBest().find(query));
 	}
 

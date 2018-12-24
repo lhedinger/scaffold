@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hedinger.scaffold.node.AbstractNode;
+import org.hedinger.scaffold.node.AbstractNode.Flag;
 import org.hedinger.scaffold.node.BranchNode;
 import org.hedinger.scaffold.node.NewlineLeaf;
 import org.hedinger.scaffold.node.RegexLeaf;
@@ -68,6 +71,7 @@ public class TemplateParser {
 						throw new Exception("Node " + childId + " not found");
 					}
 
+					child.setParent(parent);
 					((BranchNode) parent).addNode(child);
 				}
 			} else {
@@ -79,7 +83,7 @@ public class TemplateParser {
 	private void parseTemplateHelper(BufferedReader br) throws Exception {
 		int c_int = 0;
 		int state = -1;
-		String varName = "", varType = "";
+		String varDef = "", varType = "";
 
 		while ((c_int = br.read()) != -1) {
 			char c = (char) c_int;
@@ -105,13 +109,13 @@ public class TemplateParser {
 			}
 			case 1: {
 				if (c == '[') {
-					generateSlot(varType.trim(), varName, null);
+					String varName = generateSlot(varType.trim(), varDef.trim(), null);
 					parseTemplateBody(br, varType, varName);
 					varType = "";
-					varName = "";
+					varDef = "";
 					state = -1;
 				} else {
-					varName += c;
+					varDef += c;
 				}
 				break;
 			}
@@ -210,7 +214,7 @@ public class TemplateParser {
 
 		String name = "anon-" + anonymousCount;
 
-		generateSlotHelper(type, name, parent);
+		generateSlotHelper(type, name, parent, null);
 		return name;
 	}
 
@@ -231,40 +235,54 @@ public class TemplateParser {
 		linkChildHelper(name, parent);
 	}
 
-	private void generateSlot(String type, String name, String parent) throws Exception {
-		if (name == null) {
+	private String generateSlot(String type, String definition, String parent) throws Exception {
+		if (definition == null || definition.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 
-		if (name.trim().isEmpty()) {
-			throw new IllegalArgumentException();
+		String[] arr = definition.split(":", 2);
+
+		String name = arr[0];
+		String[] flags = {};
+
+		if (arr.length > 1) {
+			flags = arr[1].split(",");
 		}
 
 		if (!name.matches("[a-zA-Z0-9]*")) {
 			throw new Exception("Invalid name " + name);
 		}
 
-		generateSlotHelper(type, name, parent);
+		generateSlotHelper(type, name, parent, flags);
+		return name;
 	}
 
-	private void generateSlotHelper(String type, String name, String parent) throws Exception {
+	private void generateSlotHelper(String type, String name, String parent, String[] flagsArr) throws Exception {
 		AbstractNode node = null;
 
 		if (type == null) {
 			throw new IllegalArgumentException();
 		}
 
+		Set<Flag> flags = new HashSet<>();
+
+		if (flagsArr != null) {
+			for (String flag : flagsArr) {
+				flags.add(Flag.valueOf(flag.toUpperCase()));
+			}
+		}
+
 		if (type.equals("N")) {
-			node = new BranchNode(name, 1, 1);
+			node = new BranchNode(name, 1, 1, flags);
 		}
 		if (type.equals("M")) {
-			node = new BranchNode(name, 1);
+			node = new BranchNode(name, 1, flags);
 		}
 		if (type.equals("O")) {
-			node = new BranchNode(name, 0, 1);
+			node = new BranchNode(name, 0, 1, flags);
 		}
 		if (type.equals("R")) {
-			node = new BranchNode(name, 1, 1);
+			node = new BranchNode(name, 1, 1, flags);
 		}
 
 		if (node == null) {

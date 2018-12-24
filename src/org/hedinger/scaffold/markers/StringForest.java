@@ -56,6 +56,9 @@ public class StringForest {
 	}
 
 	public StringTree getBest() {
+		if (finishedTrees.isEmpty()) {
+			return null;
+		}
 		return finishedTrees.first();
 	}
 
@@ -67,6 +70,10 @@ public class StringForest {
 			} else if (!tree.failed()) {
 				newTrees.add(tree);
 			}
+			if (tree.failed()) {
+				// System.out.println("\n\nFAILED" + tree.toString());
+			}
+
 		}
 		trees = newTrees;
 	}

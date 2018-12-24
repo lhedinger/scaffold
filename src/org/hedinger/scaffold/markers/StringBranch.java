@@ -20,6 +20,7 @@ public class StringBranch extends StringNode {
 	private ArrayList<StringNode> children = new ArrayList<>();
 
 	private StringBounds maxRange;
+	private StringBounds totalRange;
 
 	private final boolean optional;
 	private final int maxRepetitions;
@@ -29,7 +30,6 @@ public class StringBranch extends StringNode {
 	private int childIterator = -2;
 
 	private boolean done = false;
-	private boolean skipReq = false;
 
 	public StringBranch(AbstractNode template, SmartBuffer input) {
 		super(template, input);
@@ -37,7 +37,8 @@ public class StringBranch extends StringNode {
 		optional = branchTemplate.isOptional();
 		maxRepetitions = branchTemplate.getMaxRepetitions();
 		modulo = branchTemplate.getChildren().size();
-		maxRange = new StringBounds(0, 0);
+		maxRange = new StringBounds(0, input.length());
+		totalRange = new StringBounds(0, 0);
 	}
 
 	public StringBranch(AbstractNode template, StringNode parent, int start, int end) {
@@ -46,7 +47,8 @@ public class StringBranch extends StringNode {
 		optional = branchTemplate.isOptional();
 		maxRepetitions = branchTemplate.getMaxRepetitions();
 		modulo = branchTemplate.getChildren().size();
-		maxRange = new StringBounds(start, start);
+		maxRange = new StringBounds(start, end);
+		totalRange = null;
 	}
 
 	@Override
@@ -69,16 +71,26 @@ public class StringBranch extends StringNode {
 			childIterator = 0;
 		}
 
+		if (repetition >= maxRepetitions && childIterator == 0 && maxRepetitions >= 0) {
+			return CLOSED;
+		}
+
 		StringNode currentChild = nextChild();
 
 		Status status = currentChild.grow(signal);
-		updateMaxRange(currentChild.getRange());
 
-		if (status == OPEN || status == FORK || status == FAILED) {
+		if (status == FAILED) {
+			return FAILED;
+		}
+
+		updateRange(currentChild.getRange());
+
+		if (status == OPEN || status == FORK) {
 			return status;
 		}
 
 		if (status == CLOSED) {
+
 			childIterator++;
 			if (childIterator >= modulo) {
 				childIterator = -2;
@@ -86,27 +98,45 @@ public class StringBranch extends StringNode {
 			}
 		}
 
-		if (repetition >= maxRepetitions && childIterator == -1 && maxRepetitions >= 0) {
+		if (isStrict() && detectGaps()) {
+			return FAILED;
+		}
+
+		if (repetition >= maxRepetitions && childIterator < 0 && maxRepetitions >= 0) {
 			return CLOSED;
 		}
 
 		return OPEN;
 	}
 
-	private void updateMaxRange(StringBounds childRange) {
+	private boolean detectGaps() {
+		int i = -1;
+		for (StringNode child : children) {
+			if (i == -1) {
+				i = child.getRange().end;
+			} else if (i == child.getRange().start) {
+				i = child.getRange().end;
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void updateRange(StringBounds childRange) {
 		if (childRange == null) {
 			return;
 		}
-		if (maxRange == null) {
-			maxRange = new StringBounds(childRange.start, childRange.end);
+		if (totalRange == null) {
+			totalRange = new StringBounds(childRange.start, childRange.end);
 		} else {
-			int start = maxRange.start;
-			int end = maxRange.end;
+			int start = totalRange.start;
+			int end = totalRange.end;
 
 			if (end < childRange.end) {
 				end = childRange.end;
 			}
-			maxRange = new StringBounds(start, end);
+			totalRange = new StringBounds(start, end);
 		}
 	}
 
@@ -115,12 +145,18 @@ public class StringBranch extends StringNode {
 		if (absoluteIndex < children.size()) {
 			return children.get(absoluteIndex);
 		}
+		if (repetition >= maxRepetitions && maxRepetitions > 0) {
+			return null;
+		}
+
 		StringNode nodeChild;
 		AbstractNode templateChild = branchTemplate.getChildren().get(childIterator);
 		if (templateChild instanceof BranchNode) {
-			nodeChild = new StringBranch(templateChild, this, maxRange.end, StringBounds.UNDEF);
+			nodeChild = new StringBranch(templateChild, this, (totalRange == null ? maxRange.start : totalRange.end),
+					maxRange.end);
 		} else if (templateChild instanceof LeafNode) {
-			nodeChild = new StringLeaf(templateChild, this, maxRange.end, StringBounds.UNDEF);
+			nodeChild = new StringLeaf(templateChild, this, (totalRange == null ? maxRange.start : totalRange.end),
+					maxRange.end);
 		} else {
 			throw new Exception("template is not valid type");
 		}
@@ -140,7 +176,10 @@ public class StringBranch extends StringNode {
 
 	@Override
 	public StringBounds getRange() {
-		return maxRange;
+		if (totalRange == null) {
+			return new StringBounds(maxRange.start, maxRange.start);
+		}
+		return totalRange;
 	}
 
 	@Override
@@ -206,12 +245,18 @@ public class StringBranch extends StringNode {
 		if (parent == null) {
 			branch = new StringBranch(template, input);
 		} else {
-			branch = new StringBranch(template, parent, maxRange.start, maxRange.end);
+			if (totalRange == null) {
+				branch = new StringBranch(template, parent, maxRange.start, maxRange.end);
+			} else {
+				branch = new StringBranch(template, parent, totalRange.end, maxRange.end);
+			}
 		}
 		branch.childIterator = this.childIterator;
 		branch.done = this.done;
 		branch.repetition = this.repetition;
-		branch.maxRange = new StringBounds(maxRange.start, maxRange.end);
+		if (totalRange != null) {
+			branch.totalRange = new StringBounds(totalRange.start, totalRange.end);
+		}
 
 		for (StringNode child : children) {
 			branch.children.add(child.deepClone());
@@ -222,7 +267,7 @@ public class StringBranch extends StringNode {
 
 	@Override
 	public String toString() {
-		return "range:" + String.valueOf(maxRange) + "  " + template.toString() + "\t\t" + (done ? "x" : "") + " ci="
-				+ childIterator;
+		return "range:" + String.valueOf(totalRange) + " max:" + String.valueOf(maxRange) + "  " + template.toString()
+		+ "\t\t" + (done ? "x" : "") + " ci=" + childIterator;
 	}
 }

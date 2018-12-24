@@ -17,8 +17,9 @@ public class StaticLeaf extends LeafNode {
 
 		int i = body.indexOf(value, allowedRange.start);
 
-		if (i == -1)
+		if (i == -1) {
 			return null;
+		}
 
 		StringBounds output = new StringBounds(i, i + length);
 

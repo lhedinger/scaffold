@@ -34,6 +34,7 @@ public class StringLeaf extends StringNode {
 		if (matchedRange == null) {
 			return FAILED;
 		}
+
 		return CLOSED;
 	}
 
@@ -87,6 +88,7 @@ public class StringLeaf extends StringNode {
 
 	@Override
 	public String toString() {
-		return "range:" + String.valueOf(matchedRange) + "  value:" + foundValue + "    " + template.toString();
+		return "range:" + String.valueOf(matchedRange) + " max" + String.valueOf(allowedRange) + "  value:" + foundValue
+				+ "    " + template.toString();
 	}
 }
