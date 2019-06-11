@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.hedinger.scaffold.node.AbstractNode;
-import org.hedinger.scaffold.node.Template;
+import org.hedinger.scaffold.template.TemplateNode;
+import org.hedinger.scaffold.template.TemplateTree;
 
 public class TemplateGenerator {
 
-	private TreeSet<Template> templates = new TreeSet<Template>(new TreeComparator());
+	private TreeSet<TemplateTree> templates = new TreeSet<TemplateTree>(new TreeComparator());
 
 	private List<String> samples = new ArrayList<String>();
 
@@ -26,7 +26,7 @@ public class TemplateGenerator {
 		samples.add(sample);
 	}
 
-	public AbstractNode generateTemplate() {
+	public TemplateNode generateTemplate() {
 		return null;
 	}
 
@@ -40,10 +40,10 @@ public class TemplateGenerator {
 
 	}
 
-	private static class TreeComparator implements Comparator<Template> {
+	private static class TreeComparator implements Comparator<TemplateTree> {
 
 		@Override
-		public int compare(Template o1, Template o2) {
+		public int compare(TemplateTree o1, TemplateTree o2) {
 			if (o1.getScore() < 0) {
 				return 1; // move to end
 			}

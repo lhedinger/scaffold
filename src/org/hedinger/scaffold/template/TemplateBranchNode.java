@@ -1,30 +1,30 @@
-package org.hedinger.scaffold.node;
+package org.hedinger.scaffold.template;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class BranchNode extends AbstractNode {
+public class TemplateBranchNode extends TemplateNode {
 	private static final int INFINITY = -1;
 	protected final int repMin;
 	protected final int repMax;
 
-	private ArrayList<AbstractNode> children = new ArrayList<AbstractNode>();
+	private ArrayList<TemplateNode> children = new ArrayList<TemplateNode>();
 	private int childCrawler = 0;
 
-	public BranchNode(String name, Set<Flag> flags) {
+	public TemplateBranchNode(String name, Set<Flag> flags) {
 		super(name, flags);
 		repMin = 1;
 		repMax = 1;
 	}
 
-	public BranchNode(String name, int min, Set<Flag> flags) {
+	public TemplateBranchNode(String name, int min, Set<Flag> flags) {
 		super(name, flags);
 		repMin = (min < 0 ? 0 : min);
 		repMax = INFINITY;
 	}
 
-	public BranchNode(String name, int min, int max, Set<Flag> flags) {
+	public TemplateBranchNode(String name, int min, int max, Set<Flag> flags) {
 		super(name, flags);
 		repMin = (min < 0 ? 0 : min);
 		repMax = (max < 0 ? INFINITY : max);
@@ -51,16 +51,16 @@ public class BranchNode extends AbstractNode {
 		return hasFlag(Flag.STRICT);
 	}
 
-	public void addNode(AbstractNode node) {
+	public void addNode(TemplateNode node) {
 		children.add(node);
 	}
 
-	public AbstractNode getFirst() {
+	public TemplateNode getFirst() {
 		childCrawler = 1;
 		return children.get(0);
 	}
 
-	public AbstractNode getNext() {
+	public TemplateNode getNext() {
 		if (childCrawler >= children.size()) {
 			return null;
 		}
@@ -68,7 +68,7 @@ public class BranchNode extends AbstractNode {
 		return children.get(childCrawler++);
 	}
 
-	public List<AbstractNode> getChildren() {
+	public List<TemplateNode> getChildren() {
 		return children;
 	}
 

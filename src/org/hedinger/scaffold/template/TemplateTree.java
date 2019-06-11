@@ -1,18 +1,18 @@
-package org.hedinger.scaffold.node;
+package org.hedinger.scaffold.template;
 
 import org.hedinger.scaffold.utils.TreePrinter;
 
-public class Template {
-	private AbstractNode root;
+public class TemplateTree {
+	private TemplateNode root;
 
-	public Template() {
+	public TemplateTree() {
 	}
 
-	public AbstractNode getRoot() {
+	public TemplateNode getRoot() {
 		return root;
 	}
 
-	public void setRoot(AbstractNode root) {
+	public void setRoot(TemplateNode root) {
 		this.root = root;
 	}
 

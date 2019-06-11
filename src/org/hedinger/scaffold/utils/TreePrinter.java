@@ -3,12 +3,12 @@ package org.hedinger.scaffold.utils;
 import java.util.List;
 
 import org.hedinger.scaffold.markers.StringNode;
-import org.hedinger.scaffold.node.AbstractNode;
-import org.hedinger.scaffold.node.BranchNode;
+import org.hedinger.scaffold.template.TemplateBranchNode;
+import org.hedinger.scaffold.template.TemplateNode;
 
 public class TreePrinter {
 
-	public static String print(AbstractNode root) {
+	public static String print(TemplateNode root) {
 		StringBuilder sb = new StringBuilder();
 
 		printTreeHelper(root, 0, sb);
@@ -24,7 +24,7 @@ public class TreePrinter {
 		return sb.toString();
 	}
 
-	private static void printTreeHelper(AbstractNode node, int tabs, StringBuilder sb) {
+	private static void printTreeHelper(TemplateNode node, int tabs, StringBuilder sb) {
 		sb.append('\n');
 
 		for (int i = 0; i < tabs; i++) {
@@ -33,10 +33,10 @@ public class TreePrinter {
 
 		sb.append(node.toString());
 
-		if (node instanceof BranchNode) {
-			BranchNode branch = (BranchNode) node;
+		if (node instanceof TemplateBranchNode) {
+			TemplateBranchNode branch = (TemplateBranchNode) node;
 
-			AbstractNode n = branch.getFirst();
+			TemplateNode n = branch.getFirst();
 
 			while (n != null) {
 				printTreeHelper(n, tabs + 1, sb);

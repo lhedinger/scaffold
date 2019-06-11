@@ -5,20 +5,20 @@ import static org.hedinger.scaffold.markers.Status.FAILED;
 
 import java.util.List;
 
-import org.hedinger.scaffold.node.AbstractNode;
-import org.hedinger.scaffold.node.LeafNode;
+import org.hedinger.scaffold.template.TemplateLeafNode;
+import org.hedinger.scaffold.template.TemplateNode;
 import org.hedinger.scaffold.utils.StringBounds;
 
 public class StringLeaf extends StringNode {
 
-	private LeafNode leafTemplate;
+	private TemplateLeafNode leafTemplate;
 	private StringBounds matchedRange;
 
 	private String foundValue;
 
-	public StringLeaf(AbstractNode template, StringNode parent, int start, int end) {
+	public StringLeaf(TemplateNode template, StringNode parent, int start, int end) {
 		super(template, parent, start, end);
-		leafTemplate = (LeafNode) template;
+		leafTemplate = (TemplateLeafNode) template;
 	}
 
 	@Override

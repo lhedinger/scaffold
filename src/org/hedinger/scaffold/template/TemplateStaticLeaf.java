@@ -1,13 +1,13 @@
-package org.hedinger.scaffold.node;
+package org.hedinger.scaffold.template;
 
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.StringBounds;
 
-public class StaticLeaf extends LeafNode {
+public class TemplateStaticLeaf extends TemplateLeafNode {
 
 	private final int length;
 
-	public StaticLeaf(String value) {
+	public TemplateStaticLeaf(String value) {
 		super(value);
 		length = value.length();
 	}

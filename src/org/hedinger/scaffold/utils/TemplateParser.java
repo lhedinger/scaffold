@@ -8,25 +8,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hedinger.scaffold.node.AbstractNode;
-import org.hedinger.scaffold.node.AbstractNode.Flag;
-import org.hedinger.scaffold.node.BranchNode;
-import org.hedinger.scaffold.node.NewlineLeaf;
-import org.hedinger.scaffold.node.RegexLeaf;
-import org.hedinger.scaffold.node.StaticLeaf;
-import org.hedinger.scaffold.node.Template;
+import org.hedinger.scaffold.template.TemplateBranchNode;
+import org.hedinger.scaffold.template.TemplateNewlineLeaf;
+import org.hedinger.scaffold.template.TemplateNode;
+import org.hedinger.scaffold.template.TemplateRegexLeaf;
+import org.hedinger.scaffold.template.TemplateStaticLeaf;
+import org.hedinger.scaffold.template.TemplateTree;
+import org.hedinger.scaffold.template.TemplateNode.Flag;
 
 public class TemplateParser {
 	public static final String NODE_ROOT = "root";
 	public static final String NODE_NEWLINE = "NEWLINE";
 
 	private StringBuilder logger = new StringBuilder();
-	private HashMap<String, AbstractNode> slotMap;
+	private HashMap<String, TemplateNode> slotMap;
 	private HashMap<String, ArrayList<String>> childMap;
 	private int anonymousCount;
 
 	public TemplateParser() {
-		slotMap = new HashMap<String, AbstractNode>();
+		slotMap = new HashMap<String, TemplateNode>();
 		childMap = new HashMap<String, ArrayList<String>>();
 		anonymousCount = 0;
 	}
@@ -35,8 +35,8 @@ public class TemplateParser {
 		return logger.toString();
 	}
 
-	public Template getRoot() {
-		Template template = new Template();
+	public TemplateTree getRoot() {
+		TemplateTree template = new TemplateTree();
 		template.setRoot(slotMap.get(NODE_ROOT));
 		return template;
 	}
@@ -56,23 +56,23 @@ public class TemplateParser {
 
 		br.close();
 
-		slotMap.put(NODE_NEWLINE, new NewlineLeaf());
+		slotMap.put(NODE_NEWLINE, new TemplateNewlineLeaf());
 
 		for (String parentId : childMap.keySet()) {
 			ArrayList<String> children = childMap.get(parentId);
 
-			AbstractNode parent = slotMap.get(parentId);
+			TemplateNode parent = slotMap.get(parentId);
 
-			if (parent instanceof BranchNode) {
+			if (parent instanceof TemplateBranchNode) {
 				for (String childId : children) {
-					AbstractNode child = slotMap.get(childId);
+					TemplateNode child = slotMap.get(childId);
 
 					if (child == null) {
 						throw new Exception("Node " + childId + " not found");
 					}
 
 					child.setParent(parent);
-					((BranchNode) parent).addNode(child);
+					((TemplateBranchNode) parent).addNode(child);
 				}
 			} else {
 				throw new Exception("Node " + parentId + " undefined");
@@ -227,9 +227,9 @@ public class TemplateParser {
 		String name = "static=" + anonymousCount;
 
 		if (parentType.equals("R")) {
-			slotMap.put(name, new RegexLeaf(body.trim()));
+			slotMap.put(name, new TemplateRegexLeaf(body.trim()));
 		} else {
-			slotMap.put(name, new StaticLeaf(body.trim()));
+			slotMap.put(name, new TemplateStaticLeaf(body.trim()));
 		}
 
 		linkChildHelper(name, parent);
@@ -258,7 +258,7 @@ public class TemplateParser {
 	}
 
 	private void generateSlotHelper(String type, String name, String parent, String[] flagsArr) throws Exception {
-		AbstractNode node = null;
+		TemplateNode node = null;
 
 		if (type == null) {
 			throw new IllegalArgumentException();
@@ -273,16 +273,16 @@ public class TemplateParser {
 		}
 
 		if (type.equals("N")) {
-			node = new BranchNode(name, 1, 1, flags);
+			node = new TemplateBranchNode(name, 1, 1, flags);
 		}
 		if (type.equals("M")) {
-			node = new BranchNode(name, 1, flags);
+			node = new TemplateBranchNode(name, 1, flags);
 		}
 		if (type.equals("O")) {
-			node = new BranchNode(name, 0, 1, flags);
+			node = new TemplateBranchNode(name, 0, 1, flags);
 		}
 		if (type.equals("R")) {
-			node = new BranchNode(name, 1, 1, flags);
+			node = new TemplateBranchNode(name, 1, 1, flags);
 		}
 
 		if (node == null) {

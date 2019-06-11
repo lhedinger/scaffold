@@ -8,15 +8,15 @@ import static org.hedinger.scaffold.markers.Status.OPEN;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hedinger.scaffold.node.AbstractNode;
-import org.hedinger.scaffold.node.BranchNode;
-import org.hedinger.scaffold.node.LeafNode;
+import org.hedinger.scaffold.template.TemplateBranchNode;
+import org.hedinger.scaffold.template.TemplateLeafNode;
+import org.hedinger.scaffold.template.TemplateNode;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.StringBounds;
 
 public class StringBranch extends StringNode {
 
-	private BranchNode branchTemplate;
+	private TemplateBranchNode branchTemplate;
 	private ArrayList<StringNode> children = new ArrayList<>();
 
 	private StringBounds maxRange;
@@ -31,9 +31,9 @@ public class StringBranch extends StringNode {
 
 	private boolean done = false;
 
-	public StringBranch(AbstractNode template, SmartBuffer input) {
+	public StringBranch(TemplateNode template, SmartBuffer input) {
 		super(template, input);
-		branchTemplate = (BranchNode) template;
+		branchTemplate = (TemplateBranchNode) template;
 		optional = branchTemplate.isOptional();
 		maxRepetitions = branchTemplate.getMaxRepetitions();
 		modulo = branchTemplate.getChildren().size();
@@ -41,9 +41,9 @@ public class StringBranch extends StringNode {
 		totalRange = new StringBounds(0, 0);
 	}
 
-	public StringBranch(AbstractNode template, StringNode parent, int start, int end) {
+	public StringBranch(TemplateNode template, StringNode parent, int start, int end) {
 		super(template, parent, start, end);
-		branchTemplate = (BranchNode) template;
+		branchTemplate = (TemplateBranchNode) template;
 		optional = branchTemplate.isOptional();
 		maxRepetitions = branchTemplate.getMaxRepetitions();
 		modulo = branchTemplate.getChildren().size();
@@ -150,11 +150,11 @@ public class StringBranch extends StringNode {
 		}
 
 		StringNode nodeChild;
-		AbstractNode templateChild = branchTemplate.getChildren().get(childIterator);
-		if (templateChild instanceof BranchNode) {
+		TemplateNode templateChild = branchTemplate.getChildren().get(childIterator);
+		if (templateChild instanceof TemplateBranchNode) {
 			nodeChild = new StringBranch(templateChild, this, (totalRange == null ? maxRange.start : totalRange.end),
 					maxRange.end);
-		} else if (templateChild instanceof LeafNode) {
+		} else if (templateChild instanceof TemplateLeafNode) {
 			nodeChild = new StringLeaf(templateChild, this, (totalRange == null ? maxRange.start : totalRange.end),
 					maxRange.end);
 		} else {

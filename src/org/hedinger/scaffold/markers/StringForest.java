@@ -3,7 +3,7 @@ package org.hedinger.scaffold.markers;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-import org.hedinger.scaffold.node.Template;
+import org.hedinger.scaffold.template.TemplateTree;
 import org.hedinger.scaffold.utils.SmartBuffer;
 
 public class StringForest {
@@ -13,10 +13,10 @@ public class StringForest {
 	private TreeSet<StringTree> trees = new TreeSet<StringTree>(new TreeComparator());
 	private TreeSet<StringTree> finishedTrees = new TreeSet<StringTree>(new TreeComparator());
 
-	private Template template;
+	private TemplateTree template;
 	private SmartBuffer body;
 
-	public StringForest(Template template, SmartBuffer body) {
+	public StringForest(TemplateTree template, SmartBuffer body) {
 		this.template = template;
 		this.body = body;
 	}
@@ -82,7 +82,7 @@ public class StringForest {
 		return body;
 	}
 
-	public Template getTemplate() {
+	public TemplateTree getTemplate() {
 		return template;
 	}
 

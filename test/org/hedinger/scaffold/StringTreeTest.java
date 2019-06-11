@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 
 import org.hedinger.scaffold.markers.StringForest;
-import org.hedinger.scaffold.node.AbstractNode;
-import org.hedinger.scaffold.node.Template;
+import org.hedinger.scaffold.template.TemplateNode;
+import org.hedinger.scaffold.template.TemplateTree;
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.TemplateGenerator;
 import org.hedinger.scaffold.utils.TemplateParser;
@@ -93,9 +93,9 @@ public class StringTreeTest {
 
 		String sample = "ABCZABBZ";
 
-		Template az = generateTemplate("test/templ2");
-		Template ab = generateTemplate("test/templ3");
-		Template bc = generateTemplate("test/templ4");
+		TemplateTree az = generateTemplate("test/templ2");
+		TemplateTree ab = generateTemplate("test/templ3");
+		TemplateTree bc = generateTemplate("test/templ4");
 
 		StringForest aztree = new StringForest(az, new SmartBuffer(sample));
 		StringForest abtree = new StringForest(ab, new SmartBuffer(sample));
@@ -201,7 +201,7 @@ public class StringTreeTest {
 		generator.addSample("ABCZABBZ");
 		generator.addSample("ABZAZABCZ");
 
-		AbstractNode generatedTemplate = generator.generateTemplate();
+		TemplateNode generatedTemplate = generator.generateTemplate();
 
 		System.out.println(generatedTemplate.toString());
 	}
@@ -210,7 +210,7 @@ public class StringTreeTest {
 		System.out.println(output + "  " + String.valueOf(coverage * 100) + "%");
 	}
 
-	private static Template generateTemplate(String filePath) throws Exception {
+	private static TemplateTree generateTemplate(String filePath) throws Exception {
 		TemplateParser parser = new TemplateParser();
 		parser.parseTemplate(new File(filePath));
 		return parser.getRoot();

@@ -1,37 +1,37 @@
-package org.hedinger.scaffold.node;
+package org.hedinger.scaffold.template;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractNode {
+public abstract class TemplateNode {
 	private static long ID_INC = 0L;
 
 	protected final long id;
-	protected AbstractNode parent = null;
+	protected TemplateNode parent = null;
 
 	private final String name;
 	private final Set<Flag> flags;
 
-	public AbstractNode(String name) {
+	public TemplateNode(String name) {
 		this.id = ID_INC++;
 		this.name = name;
 		this.flags = new HashSet<>();
 	}
 
-	public AbstractNode(String name, Set<Flag> flags) {
+	public TemplateNode(String name, Set<Flag> flags) {
 		this.id = ID_INC++;
 		this.name = name;
 		this.flags = flags;
 	}
 
-	public void setParent(AbstractNode node) throws Exception {
+	public void setParent(TemplateNode node) throws Exception {
 		if (parent != null) {
 			throw new Exception("Cannot set parent twice");
 		}
 		parent = node;
 	}
 
-	public AbstractNode getParent() {
+	public TemplateNode getParent() {
 		return parent;
 	}
 

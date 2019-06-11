@@ -1,14 +1,14 @@
-package org.hedinger.scaffold.node;
+package org.hedinger.scaffold.template;
 
 import org.hedinger.scaffold.utils.SmartBuffer;
 import org.hedinger.scaffold.utils.StringBounds;
 
-public abstract class LeafNode extends AbstractNode {
+public abstract class TemplateLeafNode extends TemplateNode {
 	public static final String VALUE_NULL = "NULL";
 
 	protected final String value;
 
-	public LeafNode(String value) {
+	public TemplateLeafNode(String value) {
 		super("");
 		this.value = (value == null || value.isEmpty() ? VALUE_NULL : value);
 	}
