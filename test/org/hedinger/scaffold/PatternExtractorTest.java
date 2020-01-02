@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Set;
 
 import org.hedinger.scaffold.extractor.PatternExtractor;
+import org.hedinger.scaffold.template.TemplateTree;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,16 @@ public class PatternExtractorTest {
 		Assert.assertFalse(extractor.getFrequents().contains("t"));
 		Assert.assertFalse(extractor.getFrequents().contains("tw"));
 		Assert.assertFalse(extractor.getFrequents().contains("two"));
+	}
+
+	@Test
+	public void testBuildSimpleTemplateTree() throws Exception {
+		PatternExtractor extractor = new PatternExtractor();
+		extractor.run(new File("test/pattern1"));
+
+		TemplateTree out = extractor.buildSimpleTemplateTree(new File("test/pattern1"));
+
+		Assert.assertNotNull(out);
 	}
 
 	@Test
